@@ -4,7 +4,12 @@ from bs4 import BeautifulSoup, SoupStrainer
 
 time = str(datetime.datetime.now())
 today = str(datetime.date.today())
+
+#Change this keyword to change which kind of articles are showing up!
 keyword = 'aik'
+
+#Switch for logging. If True will log to file named 'Script.log'. If False will run without logging.
+logging = True
 
 def response(url):
 	resp = requests.get(url)
@@ -113,11 +118,16 @@ def fotbollskanalen(keyword):
 			result = result + append_file(str('https://fotbollskanalen.se' + link['href']))
 	return result
 
-file_log = open('aik.log', 'a')
-file_log.write('Script started : ' + time + '\n')
+if logging == True:
+	file_log = open('script.log', 'a')
+	file_log.write('Script started : ' + time + '\n')
 
-file_log.write(aftonbladet(keyword))
-file_log.write(expressen(keyword))
-file_log.write(fotbollskanalen(keyword))
+	file_log.write(aftonbladet(keyword))
+	file_log.write(expressen(keyword))
+	file_log.write(fotbollskanalen(keyword))
 
-file_log.close()
+	file_log.close()
+else:
+	aftonbladet(keyword)
+	expressen(keyword)
+	fotbollskanalen(keyword)
