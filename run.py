@@ -9,7 +9,12 @@ today = str(datetime.date.today())
 keyword = 'aik'
 
 #Switch for logging. If True will log to file named 'Script.log'. If False will run without logging.
+#Logfile contains path of log file
 logging = True
+logfile = 'script.log'
+
+#File for storing articles
+filepath = 'links.txt'
 
 def response(url):
 	resp = requests.get(url)
@@ -20,10 +25,10 @@ def html_parse(html):
 	soup = BeautifulSoup(html, 'lxml')
 	return soup
 
-def append_file(link):
+def append_file(filepath, link):
 
-	file_object = open('links.txt','a')
-	file_read = open('links.txt', 'r')
+	file_object = open(filepath,'a')
+	file_read = open(filepath, 'r')
 	link_already = 0
 	date_already = 0
 	status_str = ''
@@ -38,8 +43,8 @@ def append_file(link):
 
 	file_object.close()
 	file_read.close()
-	file_object = open('links.txt','a')
-	file_read = open('links.txt', 'r')
+	file_object = open(filepath,'a')
+	file_read = open(filepath, 'r')
 
 	if 'sportbladet' in link:
 		for line in file_read:
@@ -51,10 +56,10 @@ def append_file(link):
 		if link_already == 0:
 			file_object.write(link + '\n')
 			print('Found new url: ' + link)
-			status_str = status_str + 'Found new url: ' + link + '\n'
+			status_str = 'Found new url: ' + link + '\n'
 		if link_already == 1:
 			print('URL found on Sportbladet Fotboll but has already been added!')
-			status_str = status_str + 'URL found on Sportbladet Fotboll but has already been added!\n'
+			status_str = 'URL found on Sportbladet Fotboll but has already been added!\n'
 		return status_str
 
 	if 'expressen' in link:
@@ -66,10 +71,10 @@ def append_file(link):
 		if link_already == 0:
 			file_object.write(link + '\n')
 			print('Found new url: ' + link)
-			status_str = status_str + 'Found new url: ' + link + '\n'
+			status_str = 'Found new url: ' + link + '\n'
 		if link_already == 1:
 			print('URL found on Expressen Fotboll but has already been added!')
-			status_str = status_str + 'URL found on Expressen Fotboll but has already been added!\n'
+			status_str = 'URL found on Expressen Fotboll but has already been added!\n'
 		return status_str
 
 	if 'fotbollskanalen' in link:
@@ -81,53 +86,53 @@ def append_file(link):
 		if link_already == 0:
 			file_object.write(link + '\n')
 			print('Found new url: ' + link)
-			status_str = status_str + 'Found new url: ' + link + '\n'
+			status_str = 'Found new url: ' + link + '\n'
 		if link_already == 1:
 			print('URL found on Fotbollskanalen but has already been added!')
-			status_str = status_str + 'URL found on Fotbollskanalen but has already been added!\n'
+			status_str = 'URL found on Fotbollskanalen but has already been added!\n'
 		return status_str
 
 	file_object.close()
 	file_read.close()
 
-def aftonbladet(keyword):
+def aftonbladet(filepath, keyword):
 	resp = response("https://www.aftonbladet.se/sportbladet/fotboll")
 	htmlparsed = html_parse(resp)
 	result = ''
 
 	for link in htmlparsed.find_all('a', href=True):
 		if keyword in link['href']:
-			result = result + append_file(str('https://www.aftonbladet.se' + link['href']))
+			result = result + str(append_file(filepath, str('https://www.aftonbladet.se' + link['href'])))
 	return result
-def expressen(keyword):
+def expressen(filepath, keyword):
 	resp = response("https://www.expressen.se/sport/fotboll/")
 	htmlparsed = html_parse(resp)
 	result = ''
 
 	for link in htmlparsed.find_all('a', href=True):
 		if keyword in link['href']:
-			result = result + append_file(str(link['href']))
+			result = result + str(append_file(filepath, str(link['href'])))
 	return result
-def fotbollskanalen(keyword):
+def fotbollskanalen(filepath, keyword):
 	resp = response('https://fotbollskanalen.se')
 	htmlparsed = html_parse(resp)
 	result = ''
 	
 	for link in htmlparsed.find_all('a', href=True):
 		if keyword in link['href']:
-			result = result + append_file(str('https://fotbollskanalen.se' + link['href']))
+			result = result + str(append_file(filepath, str('https://fotbollskanalen.se' + link['href'])))
 	return result
 
 if logging == True:
-	file_log = open('script.log', 'a')
+	file_log = open(logfile, 'a')
 	file_log.write('Script started : ' + time + '\n')
 
-	file_log.write(aftonbladet(keyword))
-	file_log.write(expressen(keyword))
-	file_log.write(fotbollskanalen(keyword))
+	file_log.write(aftonbladet(filepath, keyword))
+	file_log.write(expressen(filepath, keyword))
+	file_log.write(fotbollskanalen(filepath, keyword))
 
 	file_log.close()
 else:
-	aftonbladet(keyword)
-	expressen(keyword)
-	fotbollskanalen(keyword)
+	aftonbladet(filepath, keyword)
+	expressen(filepath, keyword)
+	fotbollskanalen(filepath, keyword)
